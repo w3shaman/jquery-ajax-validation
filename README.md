@@ -1,4 +1,4 @@
-# Jquery Ajax Validation
+# JQuery Ajax Validation
 JQuery Plugin for adding server validation feature to Ajax Form plugin.
 
 Further information can be read from here:
