@@ -1,0 +1,23 @@
+.error-field-char{
+  color:#f00;
+}
+
+.error-field-background{
+  background-color:#ffc;
+}
+
+#waiting{
+  background-color:#ffc;
+  border:1px solid #eeb;
+  padding: 3px;
+}
+
+.success{
+  color:#369;
+  font-weight:bold;
+}
+
+.failed{
+  color:#933;
+  font-weight:bold;
+}

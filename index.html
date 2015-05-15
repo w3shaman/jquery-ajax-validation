@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Ajax Form Validation</title>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+  <script src="http://malsup.github.com/jquery.form.js"></script>
+  <script src="js/jquery.ajaxvalidation.js"></script>
+  <link rel="stylesheet" type="text/css" href="css/jquery.ajaxvalidation.css" />
+</head>
+<body>
+  <div id="message"></div>
+  <br/>
+  <form id="form1" action="action.php" method="post">
+    Name :<br/>
+    <input type="text" name="name" /><br/>
+    Address :<br/>
+    <input type="text" name="address" /><br/>
+    <br/>
+    <input type="submit" name="submit" value="SAVE" />
+  </form>
+  <br/>
+  <p><i>* All validation is done in server.</i></p>
+  <script>
+    $(document).ready(function() {
+      $('#form1').ajaxvalidation({
+        errorChar:"[field-message]",
+        onComplete: function(result) {
+          if(result.status=="success"){
+            alert("Your data is valid.");
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>
