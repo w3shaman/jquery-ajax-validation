@@ -1,8 +1,9 @@
 <?php
+header("Content-type: application/json");
+
 if(isset($_POST['submit'])){
   // For delay effect
   sleep(1);
-
 
   // For storing the error fields' name
   $errorFields = array();
@@ -38,4 +39,3 @@ if(isset($_POST['submit'])){
   // Return message and error fields is JSON format
   echo json_encode($result);
 }
-?>

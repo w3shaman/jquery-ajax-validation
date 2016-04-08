@@ -1,8 +1,9 @@
 /**
  * jQuery Plugin for adding server validation feature to Ajax Form plugin
+ * @version 1.1
  * @requires jQuery 1.4 or later and jQuery Form Plugin (http://malsup.com/jquery/form/)
  *
- * Copyright (c) 2015 Lucky <bogeyman2007@gmail.com>
+ * Copyright (c) 2016 Lucky <bogeyman2007@gmail.com>
  * Licensed under the GPL license:
  *   http://www.gnu.org/licenses/gpl.html
  */
@@ -78,34 +79,40 @@
           hideLoader(options.waitingDivId);
 
           try {
-            var arr=eval("eval(" + data + ")");
+            var arr=null;
+            if (typeof data == 'string')
+              arr=$.parseJSON(data);
+            else if (typeof data == 'object')
+              arr=data;
 
-            if (arr.clearForm==true) {
-              form.clearForm();
-            }
-
-            var upload = $("input:file");
-            if (typeof upload.MultiFile === "function") {
-              if (upload.length > 0) {
-                upload.MultiFile('reset');
+            if (arr != null) {
+              if (arr.clearForm==true) {
+                form.clearForm();
               }
-            }
 
-            $(".error-field-char").remove();
-            $("input, select, textarea").removeClass('error-field-background');
-            if (arr.errorFields != null) {
-              for (var i in arr.errorFields) {
-                errorMessage = options.errorChar.replace("[field-message]", arr.errorFields[i]);
-
-                $("input[" + options.selector + "='" + i + "'], select[" + options.selector + "='" + i + "'], textarea[" + options.selector + "='" + i + "']").after('<span class="error-field-char">' + errorMessage + '</span>');
-                $("input[" + options.selector + "='" + i + "'], select[" + options.selector + "='" + i + "'], textarea[" + options.selector + "='" + i + "']").addClass('error-field-background');
+              var upload = $("input:file");
+              if (typeof upload.MultiFile === "function") {
+                if (upload.length > 0) {
+                  upload.MultiFile('reset');
+                }
               }
-            }
 
-            showMessage(options.messageDivId, '<div class="' + arr.status + '">' + arr.message + '</div>');
+              $(".error-field-char").remove();
+              $("input, select, textarea").removeClass('error-field-background');
+              if (arr.errorFields != null) {
+                for (var i in arr.errorFields) {
+                  errorMessage = options.errorChar.replace("[field-message]", arr.errorFields[i]);
 
-            if (options.onComplete != null) {
-              options.onComplete.call(this, arr);
+                  $("input[" + options.selector + "='" + i + "'], select[" + options.selector + "='" + i + "'], textarea[" + options.selector + "='" + i + "']").after('<span class="error-field-char">' + errorMessage + '</span>');
+                  $("input[" + options.selector + "='" + i + "'], select[" + options.selector + "='" + i + "'], textarea[" + options.selector + "='" + i + "']").addClass('error-field-background');
+                }
+              }
+
+              showMessage(options.messageDivId, '<div class="' + arr.status + '">' + arr.message + '</div>');
+
+              if (options.onComplete != null) {
+                options.onComplete.call(this, arr);
+              }
             }
           }
           catch(e) {
