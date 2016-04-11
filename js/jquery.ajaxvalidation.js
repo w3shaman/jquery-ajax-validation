@@ -1,6 +1,5 @@
 /**
  * jQuery Plugin for adding server validation feature to Ajax Form plugin
- * @version 1.1
  * @requires jQuery 1.4 or later and jQuery Form Plugin (http://malsup.com/jquery/form/)
  *
  * Copyright (c) 2016 Lucky <bogeyman2007@gmail.com>
@@ -9,74 +8,65 @@
  */
 
 (function($) {
-  function relocateLoader(divId) {
-    $("#" + divId).css({
-      "display":"block",
-      "position":"absolute",
-      "top":$(document).scrollTop() + "px",
-      "left":(($(window).width()- $("#" + divId).width())/2)+$(document).scrollLeft() + "px",
-      "opacity":0.8
-    });
-  }
+  function ajaxvalidation(options, element) {
+    var _options=options;
+    var _form=element;
+    var _timer;
 
-  function showLoader(divId, loadingMessage) {
-    $("#" + divId).html(loadingMessage);
-
-    relocateLoader(divId);
-
-    $(window).scroll(function() {
-      relocateLoader(divId);
-    });
-  }
-
-  function hideLoader(divId) {
-    $("#" + divId).hide();
-
-    $(window).scroll(function() {
-      $("#" + divId).hide();
-    });
-  }
-
-  function showMessage(div, message) {
-    $("#" + div).html(message);
-
-    $("#" + div).fadeIn("fast", function () {
-      hideMessage(div);
-    });
-  }
-
-  function hideMessage(div) {
-    clearTimeout($.fn.ajaxvalidation.messageTimeOut);
-    $.fn.ajaxvalidation.messageTimeOut=setTimeout('$("#' + div + '").fadeOut("fast")',10000);
-  }
-
-  $.fn.ajaxvalidation = function (opts) {
-    var options = {
-      messageDivId : "message",
-      waitingDivId : "waiting",
-      loadingMessage : "Loading...",
-      errorChar: "*",
-      onComplete: null,
-      onError: null,
-      selector: "name"
-    };
-    $.extend(options, opts);
-
-    if (options.waitingDivId != null && options.waitingDivId != "") {
-      $("body").append('<div id="' + options.waitingDivId + '"></div>');
-      hideLoader(options.waitingDivId);
+    function relocateLoader(divId) {
+      $("#" + divId).css({
+        "display":"block",
+        "position":"absolute",
+        "top":$(document).scrollTop() + "px",
+        "left":(($(window).width()- $("#" + divId).width())/2)+$(document).scrollLeft() + "px",
+        "opacity":0.8
+      });
     }
 
-    this.each(function() {
-      var form=$(this);
+    function showLoader(divId, loadingMessage) {
+      $("#" + divId).html(loadingMessage);
 
-      form.submit(function() {
-        showLoader(options.waitingDivId, options.loadingMessage);
+      relocateLoader(divId);
+
+      $(window).scroll(function() {
+        relocateLoader(divId);
+      });
+    }
+
+    function hideLoader(divId) {
+      $("#" + divId).hide();
+
+      $(window).scroll(function() {
+        $("#" + divId).hide();
+      });
+    }
+
+    function showMessage(div, message) {
+      $("#" + div).html(message);
+
+      $("#" + div).fadeIn("fast", function () {
+        hideMessage(div);
+      });
+    }
+
+    function hideMessage(div) {
+      clearTimeout(_timer);
+      _timer=setTimeout('$("#' + div + '").fadeOut("fast")',_options.messageTimeout);
+    }
+
+    this.init = function() {
+      if (_options.waitingDivId != null && _options.waitingDivId != "") {
+        $("body").append('<div id="' + _options.waitingDivId + '"></div>');
+        hideLoader(_options.waitingDivId);
+      }
+
+      _form.submit(function() {
+        showLoader(_options.waitingDivId, _options.loadingMessage);
       });
 
-      form.ajaxForm({
+      _form.ajaxForm({
         success: function(data) {
-          hideLoader(options.waitingDivId);
+          hideLoader(_options.waitingDivId);
 
           try {
             var arr=null;
@@ -86,8 +76,8 @@
               arr=data;
 
             if (arr != null) {
-              if (arr.clearForm==true) {
-                form.clearForm();
+              if (arr.clear_form==true) {
+                _form.clear_form();
               }
 
               var upload = $("input:file");
@@ -101,25 +91,25 @@
               $("input, select, textarea").removeClass('error-field-background');
               if (arr.errorFields != null) {
                 for (var i in arr.errorFields) {
-                  errorMessage = options.errorChar.replace("[field-message]", arr.errorFields[i]);
+                  errorMessage = _options.errorChar.replace("[field-message]", arr.errorFields[i]);
 
-                  $("input[" + options.selector + "='" + i + "'], select[" + options.selector + "='" + i + "'], textarea[" + options.selector + "='" + i + "']").after('<span class="error-field-char">' + errorMessage + '</span>');
-                  $("input[" + options.selector + "='" + i + "'], select[" + options.selector + "='" + i + "'], textarea[" + options.selector + "='" + i + "']").addClass('error-field-background');
+                  $("input[" + _options.selector + "='" + i + "'], select[" + _options.selector + "='" + i + "'], textarea[" + _options.selector + "='" + i + "']").after('<span class="error-field-char">' + errorMessage + '</span>');
+                  $("input[" + _options.selector + "='" + i + "'], select[" + _options.selector + "='" + i + "'], textarea[" + _options.selector + "='" + i + "']").addClass('error-field-background');
                 }
               }
 
-              showMessage(options.messageDivId, '<div class="' + arr.status + '">' + arr.message + '</div>');
+              showMessage(_options.messageDivId, '<div class="' + arr.status + '">' + arr.message + '</div>');
 
-              if (options.onComplete != null) {
-                options.onComplete.call(this, arr);
+              if (_options.onComplete != null) {
+                _options.onComplete.call(this, arr);
               }
             }
           }
           catch(e) {
-            showMessage(options.messageDivId, '<div class="failed">Oops... An error has occured!!</div>');
+            showMessage(_options.messageDivId, '<div class="failed">Oops... An error has occured!!</div>');
 
-            if (options.onComplete != null) {
-              options.onComplete.call(arr);
+            if (_options.onComplete != null) {
+              _options.onComplete.call(arr);
             }
           }
         },
@@ -131,17 +121,34 @@
             }
           }
 
-          hideLoader(options.waitingDivId);
+          hideLoader(_options.waitingDivId);
 
-          showMessage(options.messageDivId, '<div class="failed">Oops... An error has occured!</div>');
+          showMessage(_options.messageDivId, '<div class="failed">Oops... An error has occured!</div>');
 
-          if(options.onError != null) {
-            options.onError.call(xhr);
+          if(_options.onError != null) {
+            _options.onError.call(xhr);
           }
         }
       });
-    });
+    }
   }
 
-  $.fn.ajaxvalidation.messageTimeOut;
+  $.fn.ajaxvalidation = function (opts) {
+    var options = {
+      messageDivId : "message",
+      messageTimeout : 5000,
+      waitingDivId : "waiting",
+      loadingMessage : "Loading...",
+      errorChar: "*",
+      onComplete: null,
+      onError: null,
+      selector: "name"
+    };
+    $.extend(options, opts);
+
+    return this.each(function() {
+      var obj = new ajaxvalidation(options, $(this));
+      obj.init();
+    });
+  }
 })(jQuery);
